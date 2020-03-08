@@ -5,13 +5,16 @@ import speech_recognition as sr
 import platform
 from gtts import gTTS
 
+HOTWORD="hello"
 SYSTEM = platform.system()
+ON=True
 
 def speak(text):
     tts = gTTS(text=text, lang="en")
     filename = "voice.mp3"
     tts.save(filename)
     playsound.playsound(filename)
+    os.remove("voice.mp3")
 
 def shutdown(sys):
 	if sys == "Windows":
@@ -47,10 +50,27 @@ def get_audio():
 		try:
 			said = r.recognize_google(audio)
 			action(said)
+#			hot_word(said)
 		except Exception as e:
 			print("exception" + str(e))
 
+#def hot_word(word):
+#	global SYSTEM
+#	global HOTWORD
+#	if word == HOTWORD:
+#		speak("What's up")
+#	r = sr.Recognizer()
+#	with sr.Microphone() as source:
+#		audio = r.listen(source)
+#		said = ""
+#		try:
+#			said = r.recognize_google(audio)
+#			action(said)
+#		except Exception as e:
+#			print("exception" + str(e))
+
 def action(command):
+	global ON
 	if command == "shutdown":
 		speak("shutting down")
 		shutdown(SYSTEM)
@@ -66,12 +86,12 @@ def action(command):
 	elif command == "reboot":
 		speak("rebooting")
 		reboot(SYSTEM)
-
-
-def start():
-	while True:
-		get_audio()
+	elif command == "exit":
+		speak("exitting now")
+		ON=False
+		exit(0)
 
 if __name__ == "__main__":
-    speak("hello")
-    get_audio()
+	speak("Hi!")
+	while ON:
+	    get_audio()
